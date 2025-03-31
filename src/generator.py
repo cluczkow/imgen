@@ -1,6 +1,6 @@
 # filepath: c:\dev\imgen\src\generator.py
 """
-This module contains the logic for generating images.
+This module contains the logic for generating procedural routines.
 """
 
 import os
@@ -129,76 +129,3 @@ def generate_wave(draw, width, height, opacity):
             green = (255 - wave) // 2
             blue = random.randint(0, 255)
             draw.point((x, y), fill=(red, green, blue, opacity))
-
-
-def generate_image(width, height):
-    """
-    Generates a visually unique image using multiple transparent layers 
-    with diverse procedural generation routines, and saves it to the 'out' directory.
-    """
-    try:
-        start_time = time.time()  # Start timing
-
-        # Ensure the 'out' directory exists
-        output_dir = "out"
-        os.makedirs(output_dir, exist_ok=True)
-
-        # Generate a filename based on the current timestamp
-        timestamp = int(time.time() * 1000)
-        filename = f"{timestamp}.png"
-        output_path = os.path.join(output_dir, filename)
-
-        # Create a base image
-        base_image = Image.new("RGBA", (width, height), (0, 0, 0, 255))
-
-        # Define procedural generation routines
-        routines = {
-            "gradient": generate_gradient,
-            "noise": generate_noise,
-            "circles": generate_circles,
-            "stripes": generate_stripes,
-            "radial_gradient": generate_radial_gradient,
-            "perlin_noise": generate_perlin_noise,
-            "checkerboard": generate_checkerboard,
-            "fractal": generate_fractal,
-            "wave": generate_wave,
-        }
-
-        # Generate multiple layers
-        num_layers = random.randint(3, 6)  # Randomize the number of layers
-        selected_routines = []
-        layer_opacities = []
-        for _ in range(num_layers):
-            # Create a new transparent layer
-            layer = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-            draw = ImageDraw.Draw(layer)
-
-            # Randomly select a procedural routine
-            routine_name = random.choice(list(routines.keys()))
-            routine = routines[routine_name]
-            selected_routines.append(routine_name)
-
-            # Execute the routine
-            opacity = random.randint(50, 200)  # Randomize layer opacity
-            layer_opacities.append(opacity)
-            routine(draw, width, height, opacity)
-
-            # Blend the layer onto the base image
-            base_image = Image.alpha_composite(base_image, layer)
-
-        # Convert the final image to RGB and save it
-        final_image = base_image.convert("RGB")
-        final_image.save(output_path)
-
-        end_time = time.time()  # End timing
-        duration = end_time - start_time  # Calculate duration
-        print(f"Image generated in {duration:.2f} seconds.")  # Log the time taken
-
-        # Return the output path and parameters
-        return output_path, {
-            "routines": selected_routines,
-            "opacity": layer_opacities,
-            "num_layers": num_layers,
-        }
-    except Exception as e:
-        raise RuntimeError(f"Failed to generate image: {e}")

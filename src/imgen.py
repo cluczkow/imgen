@@ -14,6 +14,7 @@ from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 import joblib  # For saving and loading the trained model
 from PIL import Image, ImageDraw
+from artist import Artist, Artist_0
 
 # Import procedural routines from generator.py
 from generator import (
@@ -129,67 +130,13 @@ def generate_image_with_parameters(width, height, parameters, routines):
     return output_path, parameters
 
 def main():
-    logging.info("Starting the imgen CLI...")
+    artist = Artist()  # Create an instance of Artist
+    output_path, parameters = artist.generate(1920, 1080)
+    print(f"Generated image saved to {output_path}")
 
-    parser = argparse.ArgumentParser(description="Image generation CLI with feedback learning.")
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-
-    # Command: Generate images
-    generate_parser = subparsers.add_parser("generate", help="Generate images")
-    generate_parser.add_argument("--width", type=int, default=1920, help="Width of the image (default: 1920)")
-    generate_parser.add_argument("--height", type=int, default=1080, help="Height of the image (default: 1080)")
-    generate_parser.add_argument("-n", "--count", type=int, default=1, help="Number of images to generate (default: 1)")
-
-    # Command: Train model
-    train_parser = subparsers.add_parser("train", help="Train the model based on feedback")
-    train_parser.add_argument("--feedback", type=str, default="feedback.json", help="Path to the feedback file (default: feedback.json)")
-    train_parser.add_argument("--model", type=str, default="model.pkl", help="Path to save the trained model (default: model.pkl)")
-
-    # Command: Generate guided images
-    guided_parser = subparsers.add_parser("generate-guided", help="Generate images guided by user feedback")
-    guided_parser.add_argument("--width", type=int, default=1920, help="Width of the image (default: 1920)")
-    guided_parser.add_argument("--height", type=int, default=1080, help="Height of the image (default: 1080)")
-    guided_parser.add_argument("-n", "--count", type=int, default=1, help="Number of images to generate (default: 1)")
-    guided_parser.add_argument("--model", type=str, default="model.pkl", help="Path to the trained model (default: model.pkl)")
-
-    args = parser.parse_args()
-
-    if args.command == "generate":
-        for _ in range(args.count):
-            output_path, parameters = generate_image(args.width, args.height)
-            liked = input(f"Did you like the image {output_path}? (yes/no): ").strip().lower() == "yes"
-            feedback = {
-                "image_path": output_path,
-                "liked": liked,
-                "parameters": parameters,
-            }
-            save_feedback(feedback)
-            logging.info(f"Image generated: {output_path}")
-    elif args.command == "train":
-        train_model(feedback_file=args.feedback, model_file=args.model)
-    elif args.command == "generate-guided":
-        if not os.path.exists(args.model):
-            print(f"Trained model not found at {args.model}. Please train the model first.")
-            return
-
-        model = joblib.load(args.model)
-        routines = {
-            "gradient": generate_gradient,
-            "noise": generate_noise,
-            "circles": generate_circles,
-            "stripes": generate_stripes,
-            "radial_gradient": generate_radial_gradient,
-            "perlin_noise": generate_perlin_noise,
-            "checkerboard": generate_checkerboard,
-            "fractal": generate_fractal,
-            "wave": generate_wave,
-        }
-
-        for _ in range(args.count):
-            output_path, parameters, score = generate_image_with_feedback(args.width, args.height, model, routines)
-            print(f"Generated guided image: {output_path} (Score: {score:.2f})")
-    else:
-        parser.print_help()
+    artist = Artist_0()  # Create an instance of Artist_0
+    output_path, parameters = artist.generate(1920, 1080)
+    print(f"Generated image saved to {output_path}")
 
 if __name__ == "__main__":
     main()
